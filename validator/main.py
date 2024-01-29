@@ -1,9 +1,6 @@
-import re
-import string
 from typing import Any, Callable, Dict, Optional
 
-import rstr
-
+from guardrails.logger import logger
 from guardrails.validator_base import (
     FailResult,
     PassResult,
@@ -13,59 +10,50 @@ from guardrails.validator_base import (
 )
 
 
-@register_validator(name="guardrails/regex_match", data_type="string")
-class RegexMatch(Validator):
-    """Validates that a value matches a regular expression.
+@register_validator(name="guardrails/valid_range", data_type=["integer", "float", "percentage"])
+class ValidRange(Validator):
+    """Validates that a value is within a range.
 
     **Key Properties**
 
     | Property                      | Description                       |
     | ----------------------------- | --------------------------------- |
-    | Name for `format` attribute   | `regex_match`                     |
-    | Supported data types          | `string`                          |
-    | Programmatic fix              | Generate a string that matches the regular expression |
+    | Name for `format` attribute   | `valid-range`                     |
+    | Supported data types          | `integer`, `float`, `percentage`  |
+    | Programmatic fix              | Closest value within the range.   |
 
     Args:
-        regex: Str regex pattern
-        match_type: Str in {"search", "fullmatch"} for a regex search or full-match option
-    """  # noqa
+        min: The inclusive minimum value of the range.
+        max: The inclusive maximum value of the range.
+    """
 
     def __init__(
         self,
-        regex: str,
-        match_type: Optional[str] = None,
+        min: Optional[int] = None,
+        max: Optional[int] = None,
         on_fail: Optional[Callable] = None,
     ):
-        # todo -> something forces this to be passed as kwargs and therefore xml-ized.
-        # match_types = ["fullmatch", "search"]
+        super().__init__(on_fail=on_fail, min=min, max=max)
 
-        if match_type is None:
-            match_type = "fullmatch"
-        assert match_type in [
-            "fullmatch",
-            "search",
-        ], 'match_type must be in ["fullmatch", "search"]'
-
-        super().__init__(on_fail=on_fail, match_type=match_type, regex=regex)
-        self._regex = regex
-        self._match_type = match_type
+        self._min = min
+        self._max = max
 
     def validate(self, value: Any, metadata: Dict) -> ValidationResult:
-        p = re.compile(self._regex)
-        """Validates that value matches the provided regular expression."""
-        # Pad matching string on either side for fix
-        # example if we are performing a regex search
-        str_padding = (
-            "" if self._match_type == "fullmatch" else rstr.rstr(string.ascii_lowercase)
-        )
-        self._fix_str = str_padding + rstr.xeger(self._regex) + str_padding
+        """Validates that a value is within a range."""
+        logger.debug(f"Validating {value} is in range {self._min} - {self._max}...")
 
-        if not getattr(p, self._match_type)(value):
+        val_type = type(value)
+
+        if self._min is not None and value < val_type(self._min):
             return FailResult(
-                error_message=f"Result must match {self._regex}",
-                fix_value=self._fix_str,
+                error_message=f"Value {value} is less than {self._min}.",
+                fix_value=self._min,
             )
-        return PassResult()
 
-    def to_prompt(self, with_keywords: bool = True) -> str:
-        return "results should match " + self._regex
+        if self._max is not None and value > val_type(self._max):
+            return FailResult(
+                error_message=f"Value {value} is greater than {self._max}.",
+                fix_value=self._max,
+            )
+
+        return PassResult()

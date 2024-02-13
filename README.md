@@ -1,4 +1,4 @@
-# Overview
+## Overview
 
 | Developed by | Guardrails AI |
 | --- | --- |
@@ -8,19 +8,19 @@
 | License | Apache 2 |
 | Input/Output | Output |
 
-# Description
+## Description
 
 This validator checks to see if a given numerical output is within an expected range.
 
-# Installation
+## Installation
 
 ```bash
-$ guardrails hub install hub://guardrails/valid-range
+$ guardrails hub install hub://guardrails/valid_range
 ```
 
-# Usage Examples
+## Usage Examples
 
-## Validating string output via Python
+### Validating string output via Python
 
 In this example, we’ll use this validator to check for the age of the pet lying within some expected ranges.
 
@@ -31,9 +31,9 @@ from guardrails import Guard
 
 # Initialize Validator
 val = ValidRange(
-		min=0,
-		max=10,
-		on_fail="fix"
+    min=0,
+    max=10,
+    on_fail="fix"
 )
 
 # Setup Guard
@@ -45,7 +45,7 @@ guard.parse("5")  # Validator passes
 guard.parse("10.5")  # Validator fails
 ```
 
-## Validating JSON output via Python
+### Validating JSON output via Python
 
 In this example, we’ll use the validator to check that a field of a JSON output is within an expected range.
 
@@ -57,15 +57,15 @@ from guardrails import Guard
 
 # Initialize Validator
 val = ValidRange(
-		min=0,
-		max=10,
-		on_fail="fix"
+    min=0,
+    max=10,
+    on_fail="fix"
 )
 
 # Create Pydantic BaseModel
 class PetInfo(BaseModel):
-		pet_name: str
-		pet_age: str = Field(validators=[val])
+    pet_name: str
+    pet_age: str = Field(validators=[val])
 
 # Create a Guard to check for valid Pydantic output
 guard = Guard.from_pydantic(output_class=PetInfo)
@@ -73,21 +73,14 @@ guard = Guard.from_pydantic(output_class=PetInfo)
 # Run LLM output generating JSON through guard
 guard.parse("""
 {
-		"pet_name": "Caesar",
-		"pet_age": "5"
+    "pet_name": "Caesar",
+    "pet_age": "5"
 }
 """)
 ```
 
-## Validating string output via RAIL
 
-tbd
-
-## Validating JSON output via RAIL
-
-tbd
-
-# API Reference
+## API Reference
 
 `__init__`
 

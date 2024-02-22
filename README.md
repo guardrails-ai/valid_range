@@ -4,7 +4,7 @@
 | --- | --- |
 | Date of development | Feb 15, 2024 |
 | Validator type | Format |
-| Blog |  |
+| Blog | - |
 | License | Apache 2 |
 | Input/Output | Output |
 
@@ -15,35 +15,10 @@ This validator checks to see if a given numerical output is within an expected r
 ## Installation
 
 ```bash
-$ guardrails hub install hub://guardrails/valid_range
+guardrails hub install hub://guardrails/valid_range
 ```
 
 ## Usage Examples
-
-### Validating string output via Python
-
-In this example, we’ll use this validator to check for the age of the pet lying within some expected ranges.
-
-```python
-# Import Guard and Validator
-from guardrails.hub import ValidRange
-from guardrails import Guard
-
-# Initialize Validator
-val = ValidRange(
-    min=0,
-    max=10,
-    on_fail="fix"
-)
-
-# Setup Guard
-guard = Guard.from_string(
-    validators=[val, ...],
-)
-
-guard.parse("5")  # Validator passes
-guard.parse("10.5")  # Validator fails
-```
 
 ### Validating JSON output via Python
 
@@ -51,34 +26,50 @@ In this example, we’ll use the validator to check that a field of a JSON outpu
 
 ```python
 # Import Guard and Validator
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from guardrails.hub import ValidRange
 from guardrails import Guard
 
 # Initialize Validator
-val = ValidRange(
-    min=0,
-    max=10,
-    on_fail="fix"
-)
+val = ValidRange(min=0, max=10, on_fail="exception")
+
 
 # Create Pydantic BaseModel
 class PetInfo(BaseModel):
     pet_name: str
-    pet_age: str = Field(validators=[val])
+    pet_age: int = Field(validators=[val])
+
 
 # Create a Guard to check for valid Pydantic output
 guard = Guard.from_pydantic(output_class=PetInfo)
 
 # Run LLM output generating JSON through guard
-guard.parse("""
-{
-    "pet_name": "Caesar",
-    "pet_age": "5"
-}
-""")
-```
+guard.parse(
+    """
+    {
+        "pet_name": "Caesar",
+        "pet_age": 5
+    }
+    """
+)
 
+try:
+    # Run LLM output generating JSON through guard
+    guard.parse(
+        """
+        {
+            "pet_name": "Caesar",
+            "pet_age": 15
+        }
+        """
+    )
+except Exception as e:
+    print(e)
+```
+Output:
+```console
+Validation failed for field with errors: Value 15 is greater than 10.
+```
 
 ## API Reference
 
@@ -98,7 +89,7 @@ Initializes a new instance of the Validator class.
 
 <br>
 
-**`__call__(self, value, metadata={}) → ValidationOutcome`**
+**`__call__(self, value, metadata={}) → ValidationResult`**
 
 <ul>
 

@@ -10,7 +10,7 @@ from guardrails.validator_base import (
 )
 
 
-@register_validator(name="guardrails/valid_range", data_type=["integer", "float", "percentage"])
+@register_validator(name="guardrails/valid_range", data_type=["integer", "float"])
 class ValidRange(Validator):
     """Validates that a value is within a range.
 
@@ -18,8 +18,8 @@ class ValidRange(Validator):
 
     | Property                      | Description                       |
     | ----------------------------- | --------------------------------- |
-    | Name for `format` attribute   | `valid-range`                     |
-    | Supported data types          | `integer`, `float`, `percentage`  |
+    | Name for `format` attribute   | `guardrails/valid_range`          |
+    | Supported data types          | `integer`, `float`,               |
     | Programmatic fix              | Closest value within the range.   |
 
     Args:

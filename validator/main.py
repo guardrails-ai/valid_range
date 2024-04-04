@@ -38,7 +38,7 @@ class ValidRange(Validator):
         self._min = min
         self._max = max
 
-    def validate(self, value: Any, metadata: Dict) -> ValidationResult:
+    def validate(self, value: Any, metadata: Dict = {}) -> ValidationResult:
         """Validates that a value is within a range."""
         logger.debug(f"Validating {value} is in range {self._min} - {self._max}...")
 

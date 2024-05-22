@@ -20,7 +20,7 @@ This validator checks to see if a given numerical output is within an expected r
 ## Installation
 
 ```bash
-guardrails hub install hub://guardrails/valid_range
+$ guardrails hub install hub://guardrails/valid_range
 ```
 
 ## Usage Examples
@@ -111,4 +111,3 @@ Note:
 - **`metadata`** *(dict):* A dictionary containing metadata required for validation. No additional metadata keys are needed for this validator.
 
 </ul>
-

@@ -1,21 +1,26 @@
 ## Overview
 
 | Developed by | Guardrails AI |
-| --- | --- |
 | Date of development | Feb 15, 2024 |
 | Validator type | Format |
-| Blog | - |
+| Blog |  |
 | License | Apache 2 |
 | Input/Output | Output |
 
 ## Description
 
+### Intended Use
 This validator checks to see if a given numerical output is within an expected range.
+
+### Requirements
+
+* Dependencies:
+    - guardrails-ai>=0.4.0
 
 ## Installation
 
 ```bash
-guardrails hub install hub://guardrails/valid_range
+$ guardrails hub install hub://guardrails/valid_range
 ```
 
 ## Usage Examples
@@ -71,7 +76,7 @@ Output:
 Validation failed for field with errors: Value 15 is greater than 10.
 ```
 
-## API Reference
+# API Reference
 
 
 **`__init__(self, min=None, max=None, on_fail="noop")`**
